@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>상식 퀴즈</title>
+    <link rel="stylesheet"
+        href="https://s3.ap-northeast-2.amazonaws.com/materials.spartacodingclub.kr/easygpt/default.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+        crossorigin="anonymous"></script>
+    <style>
+        /* 꾸미기 */
+        .quiz-card:hover {
+            transform: scale(1.05);
+            /* 카드 크기를 1.05배 확대합니다. */
+            transition: transform 0.3s ease;
+            /* 부드러운 전환 효과를 추가합니다. */
+        }
+
+        .hero-section {
+            background-color: #8fb9e6;
+            /* 어두운 하늘색 배경색 */
+            color: #fff;
+            /* 흰색 글씨색 */
+            padding: 100px 0;
+            /* 위아래 여백 조정 */
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .hero-subtitle {
+            font-size: 35px;
+        }
+
+        .quiz-card {
+            margin: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+
+
+    <!-- 카드 부분 시작 -->
+    <div class="hero bg-white text-center py-2" style="margin-bottom: 50px;"></div>
+    <div class="container">
+        <div class="row">
+
+
+            <!-- 첫 번째 카드 -->
+            <div class="col-md-4 quiz-card">
+                <div class="card">
+                    <img src="https://images.latale.com/article/2022/9/29/2022093010481537759.jpg" class="card-img-top"
+                        alt="농담곰">
+                    <div class="card-body">
+                        <h5 class="card-title"><a href="quiz1.html" target="_blank">쉬움</a></h5>
+                        <h6 class="card-subtitle mb-2 text-muted"></h6>
+                        <p class="card-text"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 두 번째 카드 -->
+            <div class="col-md-4 quiz-card">
+                <div class="card">
+                    <img src="data:image/jpeg;base64,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"
+                        class="card-img-top" alt="카드 이미지2">
+                    <div class="card-body">
+                        <h5 class="card-title"><a href="상식퀴즈보통.html" target="_blank">보통</a></h5>
+                        <h6 class="card-subtitle mb-2 text-muted">OX 퀴즈!</h6>
+                        <p class="card-text"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 세 번째 카드 -->
+            <div class="col-md-4 quiz-card">
+                <div class="card">
+                    <img src="https://i.pinimg.com/474x/38/1d/ae/381dae8816f1a745f97e7e96b7dd40be.jpg"
+                        class="card-img-top" alt="카드 이미지3">
+                    <div class="card-body">
+                        <h5 class="card-title"><a href="quiz3.html" target="_blank">어려움</a></h5>
+                        <h6 class="card-subtitle mb-2 text-muted"></h6>
+                        <p class="card-text"></p>
+                    </div>
+                </div>
+            </div>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>퀴즈 사이트</title>
+</head>
+<body>
+    <h1>퀴즈 사이트</h1>
+    <div id="quizContainer">
+        <img src="" id="quizImage" alt="퀴즈 이미지">
+        <p id="question">질문이 여기에 표시됩니다.</p>
+        <button id="hintButton">힌트 보기</button> <!-- 힌트 버튼 추가 -->
+        <p id="hint" style="display: none;">힌트: 여기에 힌트가 표시됩니다.</p>
+        <input type="text" id="answer" placeholder="정답을 입력하세요">
+        <button id="checkButton">정답 확인</button>
+        <p id="result"></p>
+    </div>
+    <p id="score">맞춘 퀴즈 수: <span id="correctCount">0</span></p>
+
+    <script>
+        // 퀴즈 데이터 (질문, 이미지 URL, 정답 목록, 힌트)
+        const quizData = [
+            {
+                question: "1. 이 그룹의 이름은?",
+                imageUrl: "https://img.hankyung.com/photo/202212/01.32245693.1.jpg",
+                answers: ["HOT", "hot", "H.O.T"],
+                hint: "대표곡=> 캔디, 행복"
+            },
+            {
+                question: "2. 이 그룹의 이름은?",
+                imageUrl: "https://mblogthumb-phinf.pstatic.net/MjAxODA4MjlfNzEg/MDAxNTM1NTIyNTY4OTg4.2oOneOBwQV2IJZiVk6_A6PYD79VwjE_r2ITHAjjSYBEg.gUniOg1SCM-GH51wKKo9LwmsDmwiAZ0ngzM3bb4NcEQg.PNG.ppassong/%EC%8B%A0%ED%99%94_%EB%8D%B0%EB%B7%B0.png?type=w800",
+                answers: ["신화", ""],
+                hint: "빈칸의 단어=> 그리스로마00"
+            },
+            {
+                question: "3. 이 그룹의 이름은?",
+                imageUrl: "https://bizhankook.com/old_data/bk/news/photo/201606/20961_6497_5858.jpg",
+                answers: ["S.E.S", "SES", "ses"],
+                hint: "대표곡=> Dreams Come True, I'm Your Gir "
+            },
+            {
+                question: "4. 이 그룹의 이름은?",
+                imageUrl: "https://t1.daumcdn.net/cfile/tistory/276998415427696603",
+                answers: ["GOD", "god", "지오디"],
+                hint: "대표곡=> 촛불하나, 어머님께"
+            },
+            {
+                question: "5. 이 그룹의 이름은?",
+                imageUrl: "https://cdn.mhns.co.kr/news/photo/201907/250893_354762_5041.jpg",
+                answers: ["핑클", "Fin.K.L"],
+                hint: " 이효리의 아이돌 시절 그룹! "
+            },
+            {
+                question: "6. 이 그룹의 이름은?",
+                imageUrl: "https://i.namu.wiki/i/-l2Jt8DDLvv3H2AWGfPEJOyD_6B5Xos8yXGuhKpR05piZpQn9fAyvoX_WYmzrxZhyoisuU_oIg0uEIwW2sRevQ.webp",
+                answers: ["베이비복스", "베이비", "복스"],
+                hint: "대표곡=> yayaya , 빈칸=> 베이비00 "
+            },
+            {
+                question: "7. 이 그룹의 이름은?",
+                imageUrl: "https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/200408/htm_20040809170923a000a400-001.JPG",
+                answers: ["쿨", "cool"],
+                hint: "대표곡=> 애상, 아로하 "
+            },
+            {
+                question: "8. 이 그룹의 이름은?",
+                imageUrl: "https://newsimg.hankookilbo.com/2014/10/15/201410151293712870_1.jpg",
+                answers: ["서태지와 아이들", "서태지"],
+                hint: "대표곡=> 너에게(응답하라 1994 그노래), + 양현석(YG)의 소속그룹 이었음,,"
+            },
+            {
+                question: "9. 이 그룹의 이름은?",
+                imageUrl: "https://images.chosun.com/resizer/CTdBXW4tznfiuN8ef11XasGo4y0=/464x0/smart/cloudfront-ap-northeast-1.images.arcpublishing.com/chosun/I4VL7S6Y7HA74RJ6Q7X4CVWQ5Q.jpg",
+                answers: ["코요태", "김종민", "신지"],
+                hint: "대표곡=> 우리의 꿈(원피스), 순정 "
+            },
+            {
+                question: "10. 이 그룹의 이름은?",
+                imageUrl: "https://t1.daumcdn.net/cfile/tistory/99D07F355E5B821923",
+                answers: ["자자"],
+                hint: "대표곡=> 버스안에서"
+            },
+            // 나머지 퀴즈 데이터도 추가
+        ];
+
+        const quizContainer = document.getElementById("quizContainer");
+        const quizImage = document.getElementById("quizImage");
+        const questionElement = document.getElementById("question");
+        const hintElement = document.getElementById("hint");
+        const answerElement = document.getElementById("answer");
+        const resultElement = document.getElementById("result");
+        const scoreElement = document.getElementById("score");
+        const correctCountElement = document.getElementById("correctCount");
+        const checkButton = document.getElementById("checkButton");
+        const hintButton = document.getElementById("hintButton"); // 힌트 버튼 추가
+
+        let currentQuestionIndex = 0;
+        let correctCount = 0;
+        let hintShown = false;
+
+
+        // 퀴즈 초기화 함수
+        function initializeQuiz() {
+            const currentQuiz = quizData[currentQuestionIndex];
+            questionElement.textContent = currentQuiz.question;
+            quizImage.src = currentQuiz.imageUrl;
+            hintElement.textContent = "힌트: " + currentQuiz.hint;
+            resultElement.textContent = "";
+            answerElement.value = "";
+            hintButton.disabled = false; // 힌트 버튼 활성화
+        }
+
+        // 정답 확인 함수
+        function checkAnswer() {
+            const userAnswer = answerElement.value.toLowerCase();
+            const correctAnswers = quizData[currentQuestionIndex].answers.map(answer => answer.toLowerCase());
+
+            if (correctAnswers.includes(userAnswer)) {
+                resultElement.textContent = "정답입니다!";
+                // 맞춘 퀴즈 수 증가
+                correctCount++;
+                // 맞춘 퀴즈 수 업데이트
+                correctCountElement.textContent = correctCount;
+            } else {
+                resultElement.textContent = "틀렸습니다. 정답은 " + correctAnswers.join(" 또는 ") + "입니다.";
+            }
+
+            // 힌트 보기 버튼 클릭 이벤트 처리
+        hintButton.addEventListener("click", () => {
+            hintElement.style.display = "block"; // 힌트 표시
+            hintButton.disabled = true; // 힌트 버튼 비활성화
+            hintShown = true; // 힌트가 표시됨
+        });
+
+            // 현재 퀴즈 인덱스를 증가시켜 다음 퀴즈로 이동
+            currentQuestionIndex++;
+
+            // 힌트를 보여줬던 퀴즈라면 힌트를 초기화
+            if (hintShown) {
+                hintElement.style.display = "none";
+                hintButton.disabled = false;
+                hintShown = false;
+            }
+
+            // 모든 퀴즈를 마쳤는지 확인
+            if (currentQuestionIndex < quizData.length) {
+                initializeQuiz();
+            } else {
+                quizContainer.style.display = "none"; // 퀴즈 컨테이너 숨김
+                questionElement.textContent = "퀴즈가 종료되었습니다.";
+                hintElement.style.display = "none";
+                answerElement.style.display = "none";
+                checkButton.style.display = "none";
+                hintButton.style.display = "none"; // 힌트 버튼 숨김
+            }
+        }
+
+        // 힌트 버튼 클릭 이벤트 처리
+        hintButton.addEventListener("click", () => {
+            hintElement.style.display = "block"; // 힌트 표시
+            hintButton.disabled = false; // 힌트 버튼 비활성화
+        });
+
+        // 페이지 로드 시 퀴즈 초기화
+        initializeQuiz();
+
+        // 정답 확인 버튼 클릭 이벤트 처리
+        checkButton.addEventListener("click", () => {
+            checkAnswer();
+            moveToNextQuiz();
+        });
+    </script>
+</body>
+</html>
+ 

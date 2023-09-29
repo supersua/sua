@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>퀴즈 게임</title>
+    <link rel="stylesheet" href="https://s3.ap-northeast-2.amazonaws.com/materials.spartacodingclub.kr/easygpt/default.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+            crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url('https://i.pinimg.com/564x/0f/3a/37/0f3a37b7deca2d86846e3b185df0f1cf.jpg'); /* 사용할 이미지의 경로를 설정하세요 */
+       background-color: rgba(185, 209, 241, 3); /* 배경색 설정 및 투명도 조절 */
+    
+    
+        }
+        #quiz-container {
+            text-align: center;
+            background-color: #f3f2eec0; /* 원하는 배경색을 지정하세요 */
+            /* 다른 스타일 속성들을 추가하여 텍스트, 패딩, 여백 등을 조절할 수 있습니다. */
+            color: #2c2c2c; /* 텍스트 색상 지정 */
+            padding: 30px; /* 텍스트 주변 여백 지정 */
+        }
+        #question {
+            font-size: 45px;
+            margin-bottom: 20px;
+        }
+        label {
+            font-size: 40px;
+            color: rgb(41, 71, 109);
+        }
+        #result {
+            font-size: 45px;
+            color: rgb(230, 94, 94);
+            font-weight: bold;
+            margin-top: 20px;
+            background-color: #f3f2eec0; /* 원하는 배경색을 지정하세요 */
+            /* 다른 스타일 속성들을 추가하여 텍스트, 패딩, 여백 등을 조절할 수 있습니다. */
+            padding: 30px; /* 텍스트 주변 여백 지정 */
+            
+        }
+        #explanation {
+            font-size: 25px;
+            margin-top: 20px;
+        }
+        #image {
+            max-width: 100%;
+            margin-top: 20px;
+            display: none; /* 초기에는 이미지 숨김 */
+        }
+
+        #next-button {
+            font-size: 30px; /* 버튼 글꼴 크기 조절 */
+            padding: 20px 30px; /* 버튼 내 여백 조절 */
+            margin-top: 25px; /* 버튼과 다음 퀴즈 간격 조절 */
+            background-color: #e79d8dd2; /* 원하는 배경색을 지정하세요 */
+            /* 다른 스타일 속성들을 추가하여 텍스트, 패딩, 여백 등을 조절할 수 있습니다. */
+            color: #FFF; /* 텍스트 색상 지정 */
+            padding: 20px 30px; /* 텍스트 주변 여백 지정 */
+            border: none; /* 테두리 제거 */
+            cursor: pointer; /* 커서를 포인터로 변경하여 버튼임을 나타냅니다. */
+        }
+        #end-message {
+            font-size: 45px; /* 별도 메시지의 글꼴 크기 조절 */
+            color: rgb(235, 132, 132);
+            margin-top: 20px;
+            display: none; /* 초기에는 숨김 */
+            background-color: #f3f2eec0; /* 원하는 배경색을 지정하세요 */
+            /* 다른 스타일 속성들을 추가하여 텍스트, 패딩, 여백 등을 조절할 수 있습니다. */
+            padding: 30px; /* 텍스트 주변 여백 지정 */
+        }
+        #finish-button {
+            font-size: 24px;
+            padding: 10px 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        
+   
+        
+    </style>
+</head>
+<body>
+    <h1 id="game-title" style="font-size: 48px; color: rgb(41, 116, 179);">퀴즈 게임</h1>
+    
+
+    <div id="quiz-container">
+        <p id="question">질문이 여기에 표시됩니다.</p>
+        <label>
+            <input type="radio" name="answer" value="맞다"> 맞다
+        </label>
+        <label>
+            <input type="radio" name="answer" value="아니다"> 아니다
+        </label>
+    </div>
+
+    <button id="next-button">다음 퀴즈</button>
+
+    <p id="result"></p>
+    <p id="explanation"></p>
+    <img id="image" src="" alt="틀린 이유 이미지">
+
+    <p id="end-message">모든 퀴즈를 완료하였습니다. 축하합니다! ( :3) ×)〆 ～～～</p>
+
+    <button id="finish-button" style="display: none;">처음으로 돌아가기</button>
+
+    <p>맞춘 퀴즈 수: <span id="score">0</span></p>
+
+
+    <script>
+        // 버튼 요소를 가져옵니다.
+  var finishButton = document.getElementById("finish-button");
+
+// 버튼 클릭 이벤트를 처리합니다.
+finishButton.addEventListener("click", function() {
+  // 다른 사이트의 URL을 여기에 입력하세요.
+  var newSiteURL = "ㅗㅗ.html"; // 이 부분에 이동하고자 하는 사이트의 URL을 입력합니다.
+  
+  // 새로운 사이트로 이동합니다.
+  window.location.href = newSiteURL;
+});
+        var quizData = [
+            {
+                question: "1. 바퀴벌레는 집단 생활을 한다",
+                answer: "맞다",
+                explanation: " 바퀴벌레는 집단 생활을 하며 개체수를 늘리는 특성이 있습니다.",
+                imageUrl: "https://image.dongascience.com/Photo/2016/04/14615696505046.png" // 이미지 URL 추가
+            },
+            {
+                question: "2. 원숭이도 지문이 있다",
+                answer: "맞다",
+                explanation: "원숭이와 같은 영장류들은 손바닥에 땀샘이 있기 때문에 지문이 있습니다.",
+                imageUrl: "https://t1.daumcdn.net/cfile/tistory/25448B3C52D8D66D12" // 이미지 URL 추가
+            },
+            {
+                question: "3. 얼룩말의 무늬는 흰색바탕에 검은줄무늬 이다",
+                answer: "아니다",
+                explanation: " 얼룩말의 털을 깎으면 얼룩말의 피부색은 검은색인 것을 알 수 있습니다.",
+                imageUrl: "https://i.namu.wiki/i/1aHCz7ZemUB2VegILlQooVcMrwTXqfOWYZMnK_5gJjp-kUUVU22YPXCHumo3ZVC6kkbhRLJI4Y1OhCIPEvxwzg.webp" // 이미지 URL 추가
+            },
+            {
+                question: "4. 고양이는 단맛을 느낄 수 있다",
+                answer: "아니다",
+                explanation: " 고양이는 단맛 물질을 감지하는 수용체단백이 존재하지 않습니다.",
+                imageUrl: "https://i.namu.wiki/i/9aUQQ4YjU9vmKuHT_cZAL61VKpKsLolynnI46BhOZQuKxGJygZ6BJK2zTHoX3pcNQmmcfzcVEZQcythY1lRXBQ.webp" // 이미지 URL 추가
+            },
+            {
+                question: "5. 한국에 커피가 소개된 것은 고종 때부터이다",
+                answer: "맞다",
+                explanation: " 고종이 러시아 공사관에 피신해 있을 때 맛본 커피를 잊지 못해 돌아온 뒤에도 커피를 즐겼다고 합니다.",
+                imageUrl: "고종커피.jpg" // 이미지 URL 추가
+            },
+            {
+                question: "6. 뱀의 혀는 두개다",
+                answer: "아니다",
+                explanation: " 뱀의 혀는 하나에서 갈라진 것입니다.",
+                imageUrl: "https://mblogthumb-phinf.pstatic.net/MjAyMDA3MjlfOTAg/MDAxNTk2MDIwNDY1ODgx.rAYnV_0kYJhJbchTBFN5BSCuOxMkuq_RreLHtWJC-Jcg.SEuZQPHPMvAW-DWc8VT5cLqKQwTsv2NciOxWXt2urRQg.JPEG.aidiid/01_%EB%B1%80_%ED%98%80.jpg?type=w420" // 이미지 URL 추가
+            },
+            {
+                question: "7. 올림픽을 상징하는 오륜기의 가운데 색깔은 검정색이다",
+                answer: "맞다",
+                explanation: " 다음 사진을 보십시오.",
+                imageUrl: "https://img.etnews.com/photonews/1606/810212_20160609165638_570_0002.jpg" // 이미지 URL 추가
+            },
+            {
+                question: "8. 사람의 세포는 개미의 세포보다 크다.",
+                answer: "아니다",
+                explanation: " 세포의 크기는 모두 같습니다, 단 양의 차이가 있을뿐.",
+                imageUrl: "data:image/jpeg;base64,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" // 이미지 URL 추가
+            },
+            {
+                question: "9. 새는 뒤로 날 수 있다",
+                answer: "맞다",
+                explanation: "벌새는 세상의 다른 모든 새와 달리 바람의 영향을 받지 않고 전진, 후진, 상승, 하강, 좌우, 체공 등의 새들의 한계를 무시한 비행을 선보입니다.",
+                imageUrl: "https://post-phinf.pstatic.net/MjAyMDAzMDhfMTU4/MDAxNTgzNjExNTM0MDA5.wpehkIMjZbZ_BAyd8Uj6tGtPR7JfSoGQ9fKLhvHIPQMg.zHTgMcoQksVu3neNSxIr0MPGhaelVkREweRomyW-cigg.PNG/1.png?type=w800_q75" // 이미지 URL 추가
+            },
+            {
+                question: "10. 버스의 무임승차 나이는 6세 미만이다",
+                answer: "맞다",
+                explanation: " 만 6세 미만의 미취학 아동은 보호자 1인 기준 미취학 아동 3인까지 버스/지하철/마을버스 무임탑승 가능합니다.",
+                imageUrl: "https://i.namu.wiki/i/NB_qC6YRjH7hv6elNznBIBOBZ5AwE-PKYEWKcU03aFzGsc60bOt9KLxocyvB01OxAbOG8joW9mgkShFmTaTKsQ.webp" // 이미지 URL 추가
+            },
+        ];
+
+        var currentQuestionIndex = 0;
+        var selectedAnswer = null;
+        var questionElement = document.getElementById("question");
+        var explanationElement = document.getElementById("explanation");
+        var imageElement = document.getElementById("image");
+        var endMessageElement = document.getElementById("end-message"); // 별도 메시지 요소
+        var finishButton = document.getElementById("finish-button");
+        var answerInputs = document.querySelectorAll('input[name="answer"]');
+        var choices = document.querySelectorAll("input[type=radio]");
+        var submitButton = document.getElementById("submit");
+        var scoreElement = document.getElementById("score");
+        var correctElement = document.getElementById("correct");
+        var correctAnswers = 0;
+
+            
+
+           
+ 
+       
+
+
+
+        function displayQuestion() {
+            if (currentQuestionIndex < quizData.length) {
+                var currentQuestion = quizData[currentQuestionIndex];
+                questionElement.textContent = currentQuestion.question;
+                imageElement.src = currentQuestion.imageUrl; // 이미지 설정
+
+                // 선지 선택 초기화
+                selectedAnswer = null;
+                answerInputs.forEach(function (input) {
+                    input.checked = false;
+                });
+
+            } else {
+                questionElement.textContent = "퀴즈가 종료되었습니다.";
+                document.getElementById("quiz-container").style.display = "none";
+                document.getElementById("next-button").style.display = "none";
+                endMessageElement.style.display = "block"; // 별도 메시지 표시
+                finishButton.style.display = "block";
+                
+            }
+        }
+
+        function checkAnswer() {
+            var currentQuestion = quizData[currentQuestionIndex];
+            if (selectedAnswer === currentQuestion.answer) {
+                resultElement.textContent = "정답입니다! ପ(๑•̀ᴗ•̀)*";
+                explanationElement.textContent = "";
+                imageElement.style.display = "none";
+                document.getElementById("next-button").style.display = "block"; // 다음 퀴즈 버튼 표시
+           
+            } else {
+                resultElement.textContent = "틀렸습니다. •̀.̫•́✧";
+                explanationElement.textContent = currentQuestion.explanation;
+                imageElement.style.display = "block"; // 이미지 표시
+                setTimeout(function () {
+                    imageElement.style.display = "none"; // 이미지 숨김
+                    ocument.getElementById("next-button").style.display = "block"; // 다음 퀴즈 버튼 표시
+                }, 3500); // 이미지 표시 시간 (5초)
+            }
+            const userAnswer = document.querySelector("input[type=radio]:checked");
+    if (userAnswer) {
+      if (userAnswer.value === questions[currentQuestion].correctAnswer) {
+        score++;
+      }
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        loadQuestion();
+      } else {
+        // 퀴즈 종료 시 결과 표시
+        questionElement.textContent = "퀴즈가 종료되었습니다.";
+        choices.forEach(choice => {
+          choice.style.display = "none";
+        });
+        submitButton.style.display = "none";
+        scoreElement.textContent = score;
+        correctElement.textContent = questions.length;
+      }
+    }
+  }
+
+  loadQuestion();
+  submitButton.addEventListener("click", checkAnswer);
+        
+
+        displayQuestion();
+
+        document.querySelector("#quiz-container").addEventListener("change", function (event) {
+            selectedAnswer = event.target.value;
+        });
+
+        document.querySelector("#next-button").addEventListener("click", function () {
+            if (selectedAnswer !== null) {
+                checkAnswer();
+                currentQuestionIndex++;
+                selectedAnswer = null;
+                setTimeout(function () {
+                    displayQuestion();
+                    resultElement.textContent = "";
+                    explanationElement.textContent = "";
+                    imageElement.style.display = "none";
+                }, 3500);
+            }
+            
+        });
+        // JavaScript로 요소를 숨기는 방법
+        const h1Element = document.querySelector('h1'); // h1 요소를 선택합니다.
+        h1Element.style.display = 'none'; // 요소를 화면에서 숨깁니다.
+
+       
+
+
+
+
+        
+    </script>
+    
+</body>
+</html>
